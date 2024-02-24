@@ -1,1 +1,69 @@
-new trying to get the old commit and the new commit
+!pip install -q google-play-scraper
+#import required library
+import datetime
+import time
+import pandas as pd
+from tqdm.notebook import tqdm
+
+#data visualization library
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+#library for scrapping google play store data
+from google_play_scraper import Sort, reviews, reviews_all, app, search
+from tqdm import tqdm
+
+# Liste des termes de recherche initiaux avec les mots-clés supplémentaires
+search_terms_with_keywords = [
+    ('science-computer', ['java'])
+]
+
+# Créer une liste vide et un ensemble pour l'ID d'application unique
+search_data_list = []
+search_app_id_set = set()
+
+# Boucler sur les termes de recherche avec les mots-clés supplémentaires
+for search_term, additional_keywords in tqdm(search_terms_with_keywords):
+    # Ajouter les mots-clés supplémentaires au terme de recherche
+    search_term_with_keywords = search_term + ' ' + ' '.join(additional_keywords)
+
+    # Effectuer la recherche
+    search_results = search(
+        search_term_with_keywords,
+        lang='en',
+        country='US',
+        n_hits=8
+    )
+
+    # Parcourir les résultats de la recherche
+    for search_result in search_results:
+        search_app_id = search_result['appId']
+
+        # Vérifier si l'ID de l'application est unique, puis ajouter le résultat et l'ID de l'application à l'ensemble
+        if search_app_id not in search_app_id_set:
+            search_data_list.append(search_result)
+            search_app_id_set.add(search_app_id)
+
+
+#convert the data into dataframe and return dataframe with specific column
+search_info_df = pd.DataFrame(search_data_list)
+search_info_df = search_info_df[['appId', 'icon', 'title', 'score', 'genre', 'installs', 'developer']]
+
+
+from tqdm import tqdm
+
+# Nombre total d'itérations (nombre total d'ID d'application dans la colonne 'app_id')
+total_iterations = len(search_info_df['appId'])  # Seulement les deux premiers
+
+# Liste pour stocker toutes les critiques
+all_reviews = []
+
+# Itérer sur chaque ID d'application dans les deux premières valeurs de la colonne 'app_id'
+for i in tqdm(range(total_iterations), total=total_iterations, desc='Fetching reviews'):
+    # Obtenir l'ID de l'application
+    app_id = search_info_df['appId'].iloc[i]
+    # Utiliser cet ID d'application pour récupérer les critiques
+    reviews = reviews_all(app_id, sleep_milliseconds=0, lang='en', country='US')
+    # Ajouter ces critiques à la liste générale
+    all_reviews.extend(reviews)
+    # Vous pouvez ensuite traiter ou stocker ces critiques comme nécessaire
