@@ -17,19 +17,28 @@
 
   <script>
     function search() {
+
+
+
+        console.log("hahahahah")
       // Get the value from the input element
       var searchTerm = document.getElementById('search').value;
 
       // Perform some processing or logic based on the search term
       // For example, you can use an if-else statement or a switch statement
 
+console.log("hahahahah")
       // Simulate a simple example by checking for specific search terms
-      if (searchTerm === 'apple') {
+      if (searchTerm === 'apple') { 
+
         document.getElementById('output').innerHTML = 'Search term matched: apple';
       } else if (searchTerm === 'banana') {
+
         document.getElementById('output').innerHTML = 'Search term matched: banana';
       } else {
+        console.log("hahahahah")
         document.getElementById('output').innerHTML = 'No matching result for the search term: ' + searchTerm;
+      
       }
     }
   </script>
